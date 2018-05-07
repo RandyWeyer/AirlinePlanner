@@ -8,12 +8,12 @@ namespace AirlinePlanner.Models
 {
     public class DepartureCity
     {
-        private string _departureCityType;
+        private string _departureCity;
         private int _id;
 
-        public DepartureCity(string DepartureCityType, int Id = 0)
+        public DepartureCity(string DepartureCity, int Id = 0)
         {
-            _departureCityType = DepartureCityType;
+            _departureCity = DepartureCity;
             _id = Id;
         }
 
@@ -22,9 +22,9 @@ namespace AirlinePlanner.Models
           return _id;
         }
 
-        public string GetDepartureCityType()
+        public string GetDepartureCity()
         {
-          return _departureCityType;
+          return _departureCity;
         }
 
         public static List<DepartureCity> GetAll()
@@ -38,8 +38,8 @@ namespace AirlinePlanner.Models
             while(rdr.Read())
             {
               int departureCityId = rdr.GetInt32(0);
-              string departureCityType = rdr.GetString(1);
-              DepartureCity newDepartureCity = new DepartureCity(departureCityType, departureCityId);
+              string departureCity = rdr.GetString(1);
+              DepartureCity newDepartureCity = new DepartureCity(departureCity, departureCityId);
               allDepartureCity.Add(newDepartureCity);
             }
             conn.Close();
@@ -48,6 +48,39 @@ namespace AirlinePlanner.Models
                 conn.Dispose();
             }
             return allDepartureCity;
+        }
+
+        public static List<ArrivalCity> GetFlights()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT arrival_cities.* FROM departure_cities
+                JOIN flights ON (departure_cities.id = flights.departure_city_id)
+                JOIN items ON (flights.arrival_city_id = arrival_cities.id)
+                WHERE departure_cities.id = @DepartureCityId;";
+
+            MySqlParameter categoryIdParameter = new MySqlParameter();
+            categoryIdParameter.ParameterName = "@DepartureCityId";
+            categoryIdParameter.Value = _id;
+            cmd.Parameters.Add(departureCityIdParameter);
+
+            MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+            List<ArrivalCity> arrivalCities = new List<ArrivalCity>{};
+
+            while(rdr.Read())
+            {
+              int arrivalCityId = rdr.GetInt32(0);
+              string arrivalCityName = rdr.GetString(1);
+              ArrivalCity newArrivalCity = new Arrival(arrivalCityName, arrivalCityId);
+              items.Add(newItem);
+            }
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+            return arivalCities;
         }
 
         public static DepartureCity Find(int id)
@@ -64,20 +97,34 @@ namespace AirlinePlanner.Models
 
             var rdr = cmd.ExecuteReader() as MySqlDataReader;
             int departureCityId = 0;
-            string departureCityType = "";
+            string departureCity = "";
 
             while(rdr.Read())
             {
               departureCityId = rdr.GetInt32(0);
-              departureCityType = rdr.GetString(1);
+              departureCity = rdr.GetString(1);
             }
-            DepartureCity newDepartureCity = new DepartureCity(departureCityType, departureCityId);
+            DepartureCity newDepartureCity = new DepartureCity(departureCity, departureCityId);
             conn.Close();
             if (conn != null)
             {
                 conn.Dispose();
             }
             return newDepartureCity;
+        }
+
+        public static void DeleteAll()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"DELETE FROM departure_cities;";
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
         }
     }
 }

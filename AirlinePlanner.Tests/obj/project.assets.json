@@ -10712,6 +10712,7 @@
       "MSTest.TestFramework >= 1.1.11",
       "Microsoft.NET.Test.Sdk >= 15.0.0",
       "Microsoft.NETCore.App >= 1.1.2",
+      "MySqlConnector >= 0.40.3",
       "airlineplanner >= 1.0.0"
     ]
   },
@@ -10760,6 +10761,10 @@
           "MSTest.TestFramework": {
             "target": "Package",
             "version": "1.1.11"
+          },
+          "MySqlConnector": {
+            "target": "Package",
+            "version": "0.40.3"
           }
         }
       }
