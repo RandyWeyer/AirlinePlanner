@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AirlinePlanner.Models;
 using System;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace AirlinePlanner.Tests
 {
@@ -39,6 +40,16 @@ namespace AirlinePlanner.Tests
             string finalResult = result.GetDepartureCity();
 
             Assert.AreEqual("Seattle", finalResult);
+        }
+
+        [TestMethod]
+        public void DepartureCityId_returns_all_ArrivalId()
+        {
+            DepartureCity result = DepartureCity.Find(9);
+            int finalResult = result.GetArrivals()[0].GetId();
+            Console.WriteLine(finalResult);
+
+            Assert.AreEqual(1, finalResult);
         }
     }
 }

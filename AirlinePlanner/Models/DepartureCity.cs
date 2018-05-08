@@ -50,19 +50,19 @@ namespace AirlinePlanner.Models
             return allDepartureCity;
         }
 
-        public static List<ArrivalCity> GetFlights()
+        public List<ArrivalCity> GetArrivals()
         {
             MySqlConnection conn = DB.Connection();
             conn.Open();
             MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
             cmd.CommandText = @"SELECT arrival_cities.* FROM departure_cities
                 JOIN flights ON (departure_cities.id = flights.departure_city_id)
-                JOIN items ON (flights.arrival_city_id = arrival_cities.id)
+                JOIN arrival_cities ON (flights.arrival_city_id = arrival_cities.id)
                 WHERE departure_cities.id = @DepartureCityId;";
 
-            MySqlParameter categoryIdParameter = new MySqlParameter();
-            categoryIdParameter.ParameterName = "@DepartureCityId";
-            categoryIdParameter.Value = _id;
+            MySqlParameter departureCityIdParameter = new MySqlParameter();
+            departureCityIdParameter.ParameterName = "@DepartureCityId";
+            departureCityIdParameter.Value = _id;
             cmd.Parameters.Add(departureCityIdParameter);
 
             MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
@@ -72,15 +72,15 @@ namespace AirlinePlanner.Models
             {
               int arrivalCityId = rdr.GetInt32(0);
               string arrivalCityName = rdr.GetString(1);
-              ArrivalCity newArrivalCity = new Arrival(arrivalCityName, arrivalCityId);
-              items.Add(newItem);
+              ArrivalCity newArrivalCity = new ArrivalCity(arrivalCityName, arrivalCityId);
+              arrivalCities.Add(newArrivalCity);
             }
             conn.Close();
             if (conn != null)
             {
                 conn.Dispose();
             }
-            return arivalCities;
+            return arrivalCities;
         }
 
         public static DepartureCity Find(int id)

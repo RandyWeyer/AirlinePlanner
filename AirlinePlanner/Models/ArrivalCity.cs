@@ -26,7 +26,7 @@ namespace AirlinePlanner.Models
             _arrivalCityName = ArrivalCityName;
         }
 
-        public int GetArrivalCityId()
+        public int GetId()
         {
             return _id;
         }
@@ -41,7 +41,7 @@ namespace AirlinePlanner.Models
           else
           {
              ArrivalCity newArrivalCity = (ArrivalCity) otherArrivalCity;
-             bool idEquality = this.GetArrivalCityId() == newArrivalCity.GetArrivalCityId();
+             bool idEquality = this.GetId() == newArrivalCity.GetId();
              bool nameEquality = this.GetArrivalCityName() == newArrivalCity.GetArrivalCityName();
              return (idEquality && nameEquality);
            }
@@ -90,6 +90,39 @@ namespace AirlinePlanner.Models
                 conn.Dispose();
             }
             return allArrivalCities;
+        }
+
+        public List<DepartureCity> GetArrivals()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT departure_cities.* FROM arrival_cities
+                JOIN flights ON (arrival_cities.id = flights.arrival_city_id)
+                JOIN departure_cities ON (flights.departure_city_id = departure_cities.id)
+                WHERE arrival_cities.id = @ArrivalCityId;";
+
+            MySqlParameter arrivalCityIdParameter = new MySqlParameter();
+            arrivalCityIdParameter.ParameterName = "@ArrivalCityId";
+            arrivalCityIdParameter.Value = _id;
+            cmd.Parameters.Add(arrivalCityIdParameter);
+
+            MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+            List<DepartureCity> departureCities = new List<DepartureCity>{};
+
+            while(rdr.Read())
+            {
+              int departureCityId = rdr.GetInt32(0);
+              string departureCityName = rdr.GetString(1);
+              DepartureCity newDepartureCity = new DepartureCity(departureCityName, departureCityId);
+              departureCities.Add(newDepartureCity);
+            }
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+            return departureCities;
         }
 
         public static ArrivalCity Find(int arrivalId)
