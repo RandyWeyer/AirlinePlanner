@@ -1,0 +1,27 @@
+@using AirlinePlanner.Models;
+
+<h1>Airline Planner</h1>
+<h2>Arrival: @Model["selectedArrivalCity"].GetArrivalCityName()</h2>
+<hr />
+@if (@Model["flights"].Count != 0)
+{
+  <h4>Here are all the arrivals:</h4>
+  <ul>
+    @foreach (var departures in @Model["flights"])
+    {
+      <li>@departures.GetDepartureCity()</li>
+    }
+  </ul>
+}
+<h4>Add a departure city to this list:</h4>
+<form action='/arrivals/@Model["selectedArrivalCity"].GetId()/departures/new' method='post'>
+  <label for='departure-id'>Select a departure</label>
+  <select id='departure-id' name='departure-id' type='text'>
+    @foreach (var departure in @Model["allDepartures"])
+    {
+      <option value='@departure.GetId()'>@departure.GetDepartureCity()</option>
+    }
+  </select>
+  <button type='submit'>Add</button>
+</form>
+<p><a href="/">Return to Main Page</a></p>

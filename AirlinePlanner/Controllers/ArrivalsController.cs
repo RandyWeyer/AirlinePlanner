@@ -24,7 +24,28 @@ namespace AirlinePlanner.Controllers
         {
             ArrivalCity newArrivalCity = new ArrivalCity(Request.Form["arrival-city"]);
             newArrivalCity.Save();
-            return RedirectToAction("Success", "Home");
+            return View("Success", "Home");
+        }
+
+        [HttpGet("/arrivals/{id}")]
+        public ActionResult ViewArrivals(int id)
+        {
+            Dictionary<string, object> model = new Dictionary<string, object>();
+            ArrivalCity selectedArrivalCity = ArrivalCity.Find(id);
+            List<DepartureCity> flights = selectedArrivalCity.GetDepartures();
+            List<DepartureCity> allDepartures = DepartureCity.GetAll();
+            model.Add("selectedArrivalCity", selectedArrivalCity);
+            model.Add("flights", flights);
+            model.Add("allDepartures", allDepartures);
+            return View(model);
+        }
+        [HttpPost("/arrivals/{departureId}/departures/new")]
+        public ActionResult AddDepartureToArrival(int departureId)
+        {
+            ArrivalCity arrival = ArrivalCity.Find(departureId);
+            DepartureCity departure = DepartureCity.Find(Int32.Parse(Request.Form["departure-id"]));
+            arrival.SetDepartures(departure); //Want to run the join table method
+            return RedirectToAction("ViewArrivals",  new { id = departureId });
         }
     }
 }

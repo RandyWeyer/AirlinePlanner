@@ -92,7 +92,7 @@ namespace AirlinePlanner.Models
             return allArrivalCities;
         }
 
-        public List<DepartureCity> GetArrivals()
+        public List<DepartureCity> GetDepartures()
         {
             MySqlConnection conn = DB.Connection();
             conn.Open();
@@ -123,6 +123,31 @@ namespace AirlinePlanner.Models
                 conn.Dispose();
             }
             return departureCities;
+        }
+
+        public void SetDepartures(DepartureCity newDeparturelCity)
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"INSERT INTO flights ( arrival_city_id, departure_city_id) VALUES (@ArrivalCityId, @DepartureCityId);";
+
+            MySqlParameter departure_city_id = new MySqlParameter();
+            departure_city_id.ParameterName = "@DepartureCityId";
+            departure_city_id.Value = newDeparturelCity.GetId();
+            cmd.Parameters.Add(departure_city_id);
+
+            MySqlParameter arrival_city_id = new MySqlParameter();
+            arrival_city_id.ParameterName = "@ArrivalCityId";
+            arrival_city_id.Value = _id;
+            cmd.Parameters.Add(arrival_city_id);
+
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
         }
 
         public static ArrivalCity Find(int arrivalId)
