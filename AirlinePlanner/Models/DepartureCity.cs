@@ -27,6 +27,28 @@ namespace AirlinePlanner.Models
           return _departureCity;
         }
 
+        public void Save()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"INSERT INTO departure_cities (departure_city) VALUES (@departure_city);";
+
+            MySqlParameter departureCity = new MySqlParameter();
+            departureCity.ParameterName = "@departure_city";
+            departureCity.Value = this._departureCity;
+            cmd.Parameters.Add(departureCity);
+
+            cmd.ExecuteNonQuery();
+            _id = (int) cmd.LastInsertedId;
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+        }
+
         public static List<DepartureCity> GetAll()
         {
             List<DepartureCity> allDepartureCity = new List<DepartureCity> {};
@@ -49,7 +71,7 @@ namespace AirlinePlanner.Models
             }
             return allDepartureCity;
         }
-
+//read input to join-table
         public List<ArrivalCity> GetArrivals()
         {
             MySqlConnection conn = DB.Connection();
@@ -81,6 +103,31 @@ namespace AirlinePlanner.Models
                 conn.Dispose();
             }
             return arrivalCities;
+        }
+//saves input to join table
+        public void SetArrivals(ArrivalCity newArrivalCity)
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"INSERT INTO flights (arrival_city_id, departure_city_id) VALUES (@ArrivalCityId, @DepartureCityId);";
+
+            MySqlParameter arrival_city_id = new MySqlParameter();
+            arrival_city_id.ParameterName = "@ArrivalCityId";
+            arrival_city_id.Value = newArrivalCity.GetId();
+            cmd.Parameters.Add(arrival_city_id);
+
+            MySqlParameter departure_city_id = new MySqlParameter();
+            departure_city_id.ParameterName = "@DepartureCityId";
+            departure_city_id.Value = _id;
+            cmd.Parameters.Add(departure_city_id);
+
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
         }
 
         public static DepartureCity Find(int id)
