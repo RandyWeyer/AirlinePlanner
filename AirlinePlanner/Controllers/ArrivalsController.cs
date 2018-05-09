@@ -32,7 +32,7 @@ namespace AirlinePlanner.Controllers
         {
             Dictionary<string, object> model = new Dictionary<string, object>();
             ArrivalCity selectedArrivalCity = ArrivalCity.Find(id);
-            List<DepartureCity> flights = selectedArrivalCity.GetDepartures();
+            List<Flight> flights = selectedArrivalCity.GetInboundFlights();
             List<DepartureCity> allDepartures = DepartureCity.GetAll();
             model.Add("selectedArrivalCity", selectedArrivalCity);
             model.Add("flights", flights);
@@ -46,6 +46,18 @@ namespace AirlinePlanner.Controllers
             DepartureCity departure = DepartureCity.Find(Int32.Parse(Request.Form["departure-id"]));
             arrival.SetDepartures(departure); //Want to run the join table method
             return RedirectToAction("ViewArrivals",  new { id = departureId });
+        }
+
+        [HttpGet("/arrivals/{id}/delete")]
+        public ActionResult Delete(int id)
+        {
+            Dictionary<string, object> model = new Dictionary<string, object>();
+            Flight selectedFlight = Flight.Find(id);
+            int arrivalCityId = selectedFlight.GetArrivalCityId();
+            selectedFlight.DeleteFlight();
+            return RedirectToAction("ViewArrivals",  new { id = arrivalCityId });
+
+
         }
     }
 }

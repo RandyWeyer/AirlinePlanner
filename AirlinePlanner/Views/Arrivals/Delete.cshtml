@@ -12,9 +12,9 @@
 {
   <h4>Here are all the arrivals:</h4>
   <ul>
-    @foreach (var flight in @Model["flights"])
+    @foreach (var departures in @Model["flights"])
     {
-      <li>@DepartureCity.Find(flight.GetDepartureCityId()).GetDepartureCity() <a href="/arrivals/@flight.GetFlightId()/delete">Delete</a></li>
+      <li>@departures.GetDepartureCity() </li>
     }
   </ul>
 }

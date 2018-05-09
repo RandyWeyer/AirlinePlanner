@@ -96,49 +96,54 @@ namespace AirlinePlanner.Models
             return allArrivalCities;
         }
 
-        public List<DepartureCity> GetDepartures()
+        public List<Flight> GetInboundFlights()
         {
             MySqlConnection conn = DB.Connection();
             conn.Open();
             MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT departure_cities.* FROM arrival_cities
-                JOIN flights ON (arrival_cities.id = flights.arrival_city_id)
-                JOIN departure_cities ON (flights.departure_city_id = departure_cities.id)
-                WHERE arrival_cities.id = @ArrivalCityId;";
+            // cmd.CommandText = @"SELECT departure_cities.* FROM arrival_cities
+            //     JOIN flights ON (arrival_cities.id = flights.arrival_city_id)
+            //     JOIN departure_cities ON (flights.departure_city_id = departure_cities.id)
+            //     WHERE arrival_cities.id = @ArrivalCityId;";
+
+            cmd.CommandText = @"SELECT * FROM flights WHERE arrival_city_id = @ThisCityId;";
+
 
             MySqlParameter arrivalCityIdParameter = new MySqlParameter();
-            arrivalCityIdParameter.ParameterName = "@ArrivalCityId";
+            arrivalCityIdParameter.ParameterName = "@ThisCityId";
             arrivalCityIdParameter.Value = _id;
             cmd.Parameters.Add(arrivalCityIdParameter);
 
             MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
-            List<DepartureCity> departureCities = new List<DepartureCity>{};
+            List<Flight> inboundFlights = new List<Flight>{};
 
             while(rdr.Read())
             {
-              int departureCityId = rdr.GetInt32(0);
-              string departureCityName = rdr.GetString(1);
-              DepartureCity newDepartureCity = new DepartureCity(departureCityName, departureCityId);
-              departureCities.Add(newDepartureCity);
+              int flightId = rdr.GetInt32(0);
+              int departureCityId = rdr.GetInt32(1);
+              int arrivalCityId = rdr.GetInt32(2);
+              Flight newInboundFlight = new Flight(departureCityId, arrivalCityId, flightId);
+              inboundFlights.Add(newInboundFlight);
             }
             conn.Close();
             if (conn != null)
             {
                 conn.Dispose();
             }
-            return departureCities;
+            return inboundFlights;
         }
 
-        public void SetDepartures(DepartureCity newDeparturelCity)
+
+        public void SetDepartures(DepartureCity newDepartureCity)
         {
             MySqlConnection conn = DB.Connection();
             conn.Open();
             var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO flights ( arrival_city_id, departure_city_id) VALUES (@ArrivalCityId, @DepartureCityId);";
+            cmd.CommandText = @"INSERT INTO flights (arrival_city_id, departure_city_id) VALUES (@ArrivalCityId, @DepartureCityId);";
 
             MySqlParameter departure_city_id = new MySqlParameter();
             departure_city_id.ParameterName = "@DepartureCityId";
-            departure_city_id.Value = newDeparturelCity.GetId();
+            departure_city_id.Value = newDepartureCity.GetId();
             cmd.Parameters.Add(departure_city_id);
 
             MySqlParameter arrival_city_id = new MySqlParameter();
