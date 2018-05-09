@@ -1,3 +1,8 @@
+@{
+  Layout = "_Layout";
+}
+
+
 @using AirlinePlanner.Models;
 
 <h1>Airline Planner</h1>
@@ -22,6 +27,6 @@
       <option value='@arrival.GetId()'>@arrival.GetArrivalCityName()</option>
     }
   </select>
-  <button type='submit'>Add</button>
+  <button class="btn btn-primary" type='submit'>Add</button>
 </form>
 <p><a href="/">Return to Main Page</a></p>

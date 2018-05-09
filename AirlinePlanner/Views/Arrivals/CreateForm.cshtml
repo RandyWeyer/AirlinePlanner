@@ -1,8 +1,13 @@
+@{
+  Layout = "_Layout";
+}
+
+
 <h1>Add a new Arrival City</h1>
 <form action="/create-arrival-city" method="post">
   <label for="arrival-city">Name of Arrival City:</label>
   <input id="arrival-city" name="arrival-city" type="text">
-  <button type="submit">Add New City!</button>
+  <button class="btn btn-primary" type="submit">Add New City</button>
 </form>
 <p><a href="/">Back home</a></p>
 <p><a href="/index">View all Arrivals</a></p>

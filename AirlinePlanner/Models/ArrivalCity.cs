@@ -46,6 +46,10 @@ namespace AirlinePlanner.Models
              return (idEquality && nameEquality);
            }
         }
+        public override int GetHashCode()
+        {
+             return this.GetArrivalCityName().GetHashCode();
+        }
 
         public void Save()
         {
